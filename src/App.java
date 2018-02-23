@@ -15,8 +15,12 @@ public class App
 		TescoAPI cloud = new TescoAPI();
 		//System.out.println(cloud.searchName("cheese").size());
 		
-		System.out.println(cloud.searchName("chair").size());
+		//System.out.println(cloud.searchBarcode("5449000034335"));
+		//System.out.println(cloud.searchBarcode("5024616003083"));
+		//System.out.println(cloud.searchBarcode("5012583204749"));
+		System.out.println(cloud.searchBarcode("5054775701377"));
 		
+		System.out.println(cloud.searchName("Tesco Finest Strawberry Pepper Dark Chocolate Popcorn 170 G").size());
 	}
 
 }
