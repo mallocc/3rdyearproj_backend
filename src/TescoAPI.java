@@ -60,9 +60,12 @@ public class TescoAPI
 		{
 			JSONObject j = (JSONObject) iterator.next();
 			String tpnc = j.get("id").toString();
+			String desc = j.get("name").toString();
 			Product p = getTPNC(tpnc);
 			if (p != null)
 				ps.add(p);
+			else
+				ps.add(new Product(desc, tpnc, scapeTPNC(tpnc)));
 		}
 
 		return ps;
@@ -87,6 +90,7 @@ public class TescoAPI
 			String name = j.get("description").toString();
 			// get barcode of product
 			String barcode = j.get("gtin").toString();
+			
 			// if there is a calcNutrition section
 			if (j.get("calcNutrition") != null)
 			{
@@ -138,11 +142,12 @@ public class TescoAPI
 				// return new product
 				return new Product(name, barcode, nt);
 			}
+			return new Product(name, barcode, null);
 		}
 		return null;
 	}
 
-	public Product getTPNC(String number) throws IOException, ParseException
+	private  Product getTPNC(String number) throws IOException, ParseException
 	{
 		// form request
 		String url = "https://dev.tescolabs.com/product/?tpnc=" + number;
@@ -163,7 +168,7 @@ public class TescoAPI
 		return getJSONProduct(s);
 	}
 
-	public Product getGTIN(String number) throws IOException, ParseException
+	private  Product getGTIN(String number) throws IOException, ParseException
 	{
 		// form request
 		String url = "https://dev.tescolabs.com/product/?gtin=" + number;
@@ -183,18 +188,28 @@ public class TescoAPI
 
 		return getJSONProduct(s);
 	}
-
-	public void test() throws IOException
+	
+	public Product searchBarcode(String barcode)
 	{
+		
+		return null;
+	}
+
+	private NutritionTable scapeTPNC(String number) throws IOException
+	{
+		NutritionTable nt = new NutritionTable();
+
+		System.out.println(number);
+		
 		// form request
-		String url = "https://www.tesco.com/groceries/en-GB/products/254852466";
+		String url = "https://www.tesco.com/groceries/en-GB/products/" + number;
 		Document doc = Jsoup.connect(url).get();
 		Elements headerrow = doc.select("th");
 		int col = 0;
 		int i = 0;
 		for (Element column : headerrow)
 		{
-			if (column.text().contains("100g"))
+			if (column.text().contains("100"))
 				col = i;
 			i++;
 		}
@@ -204,28 +219,52 @@ public class TescoAPI
 		{
 			i = 0;
 			Elements columns = row.select("td");
-			for (Element column : columns)
+			for (Element c : columns)
 			{
-				if (i == col)
+				String ct = c.text().toLowerCase();
+				for (Element column : columns)
 				{
-					String s = column.text();
-					s = s.toLowerCase();
-					if (s.contains("kcal"))
-					{											
-						s = s.replaceAll("\\/", "");
-						s = s.replaceAll("\\(", "");
-						s = s.replaceAll("\\)", "");
-						s = s.replaceAll("g", "");
-						String[] split = s.split("kj");
-						s = split[1].replaceAll("kcal", "");						
+					if (i == col)
+					{
+						String s = column.text();
+						s = s.toLowerCase();
+						s = s.replaceAll("-", "0");
+						if (s.contains("kcal"))
+						{
+							s = s.replaceAll("\\/", "");
+							s = s.replaceAll("\\(", "");
+							s = s.replaceAll("\\)", "");
+							s = s.replaceAll("g", "");
+							String[] split = s.split("kj");
+							s = split[1].replaceAll("kcal", "");
+						} else
+						{
+							s = s.replaceAll("g", "");
+						}
+
+						if (ct.contains("energy"))
+							nt.setEnergy(Float.parseFloat(s));
+						if (ct.contains("fat"))
+							nt.setFat(Float.parseFloat(s));
+						if (ct.contains("sat"))
+							nt.setSats(Float.parseFloat(s));
+						if (ct.contains("sugar"))
+							nt.setSugars(Float.parseFloat(s));
+						if (ct.contains("fibre"))
+							nt.setFibre(Float.parseFloat(s));
+						if (ct.contains("protein"))
+							nt.setProtein(Float.parseFloat(s));
+						if (ct.contains("salt"))
+							nt.setSalt(Float.parseFloat(s));
+						if (ct.contains("carb"))
+							nt.setCarbs(Float.parseFloat(s));
 					}
-					else
-						s = s.replaceAll("g", "");
-					System.out.println(s);
+					i++;
 				}
-				i++;
+				break;
 			}
 		}
 
+		return nt;
 	}
 }

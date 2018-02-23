@@ -1,7 +1,7 @@
 
 public class NutritionTable
 {
-	float energy, fat, sats, sugars, fibre, protein, salt, carbs;
+	float energy =0, fat=0, sats=0, sugars=0, fibre=0, protein=0, salt=0, carbs=0;
 
 	public NutritionTable()
 	{
@@ -29,7 +29,7 @@ public class NutritionTable
 		this.carbs = carbs;
 	}
 
-	public void setEnergy(int energy)
+	public void setEnergy(float energy)
 	{
 		this.energy = energy;
 	}

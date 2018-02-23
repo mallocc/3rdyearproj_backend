@@ -14,7 +14,9 @@ public class App
 		
 		TescoAPI cloud = new TescoAPI();
 		//System.out.println(cloud.searchName("cheese").size());
-		cloud.test();
+		
+		System.out.println(cloud.searchName("chair").size());
+		
 	}
 
 }

@@ -10,6 +10,7 @@ public class Product
 	String description;
 	NutritionTable nutrition;
 	String barcode;
+	String tpnc, gtin;
 
 	Product(String name, String barcode, NutritionTable nutrition)
 	{

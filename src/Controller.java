@@ -22,7 +22,7 @@ public class Controller
 		String barcode = reader.scanBarcode();	
 		Product p = null;
 		if(!model.productExists(barcode))
-			model.addProduct(p = cloud.getGTIN(barcode));
+			model.addProduct(p = cloud.searchBarcode(barcode));
 		else
 			p = model.getProductBarcode(barcode);
 		if(p == null)
